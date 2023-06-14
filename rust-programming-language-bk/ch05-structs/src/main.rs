@@ -10,7 +10,27 @@ struct User {
     sign_in_count: u64,
 }
 
+// tuple structs
+// using tuple structs without named fields to create different types
+// defining tuple structs
+#[allow(dead_code)]
+struct Color(i32, i32, i32);
+#[allow(dead_code)]
+struct Point(i32, i32, i32);
+
+// unit like structs without any fields
+struct AlwaysEqual;
+
 fn main() {
+    // instantiating tuple structs
+    let black = Color(0, 0, 0);
+    let origin: Point = Point(0, 0, 0);
+    println!("Color black ({}, {}, {})", black.0, black.1, black.2);
+    println!("Origin point ({}, {}, {})", origin.0, origin.1, origin.2);
+
+    // instantiating unit-like struct
+    let _subject = AlwaysEqual;
+
     // making use of the defined struct
     // by creating an instance and specifying concrete values
     // aka key: value pairs
@@ -43,7 +63,7 @@ fn main() {
     );
     println!("User3: {}, {}", user3.username, user3.email);
 
-    // creating instannces from other instances with struct update syntax
+    // creating instances from other instances with struct update syntax
     let user4 = User {
         email: String::from("dixieFlatine@example.com"),
         ..user1 // must come last, remaing fields get values from corresponding fields
@@ -52,6 +72,12 @@ fn main() {
     // values have been moved so user1 no longer can be called
     // println!("New user with with struct update syntax: {:?}", user1);
     println!("Email of user1: {}", user1.email);
+
+    // tuple structs
+    // using tuple structs without named fields to create different types
+    struct Color(i32, i32, i32);
+    struct Point(i32, i32, i32);
+
 
 }
 
