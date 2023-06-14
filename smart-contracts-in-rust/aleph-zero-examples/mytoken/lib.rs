@@ -1,6 +1,20 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
+/// example contract following tutorial at 
+/// https://docs.alephzero.org/aleph-zero/build/aleph-zero-smart-contracts-basics/creating-your-first-contract
+/// simple version of ERC20 token
+/// contract when intantiated will create pool of fungible tokens that can be transferred between accounts
+/// (1) contract will hold a registry of accounts with balances
+/// (2) contract will provide methods to query balances and transfer tokens
+
+/// smart contract written in ink! is regular Rust code that makes use of ink! macros
+/// the macros modify the compilation process in order to produce WASM code
+
+/// the #![cfg_attr(not(feature = "std"), no_std, no_main)] macro at the top 
+/// instructs the compiler to not use the standards library
 
 #[ink::contract]
+/// module prefixed with the main ink! macro
+/// sets type aliases like Balance and Account
 mod mytoken {
 
     /// Defines the storage of your contract.
