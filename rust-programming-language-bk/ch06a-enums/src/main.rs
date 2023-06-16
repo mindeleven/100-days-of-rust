@@ -15,6 +15,25 @@
     V6(String),
 }
 
+// another enum example with a wide variety of types
+// four variants with different types
+// defining an enum like this is similar to defining different kind of struct definitions
+ #[derive(Debug)]
+ #[allow(dead_code)]
+ enum Message {
+    Quit, // no data associated with it at all
+    Move {x: i32, y: i32}, // has named fields like struct
+    Write(String), // includes single string
+    ChangeColor(i32, i32, i32), // includes three i32 values
+}
+
+// defining a method on an enum
+impl Message {
+    fn call(&self) {
+        println!("Don't call us, we call you")
+    }
+}
+
 // struct to store IP addresses
 //  #[derive(Debug)]
 //  struct IpAddr {
@@ -44,6 +63,9 @@ fn main() {
     let loopback: IpAddrKindV2 = IpAddrKindV2::V6(String::from("::1"));
     println!("loopback: {:#?}", loopback);
 
+    let m = Message::Write(String::from("Hello"));
+    println!("Message written: {:#?}", m);
+    m.call();
 
 }
 
