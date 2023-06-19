@@ -11,49 +11,81 @@
 
 /// the #![cfg_attr(not(feature = "std"), no_std, no_main)] macro at the top 
 /// instructs the compiler to not use the standards library
+/// in ink! smart contracts you cannot use data structures from the standard library
 
 #[ink::contract]
 /// module prefixed with the main ink! macro
 /// sets type aliases like Balance and Account
+/// #[ink::contract] macro tells ink! that module is a definition of a smart contract
+/// a contract needs to have exactly one struct marked as #[ink::storage]
+/// a contract needs to have at least one function marked as #[ink::constructor]
 mod mytoken {
-
+    use ink::{storage::Mapping, primitives::AccountId};
     /// Defines the storage of your contract.
+    /// contains data that's stored on the blockchain
+    /// holds the state of the contract
     /// Add new fields to the below struct in order
     /// to add new static storage fields to your contract.
     #[ink(storage)]
+    #[derive(Default)]
     pub struct Mytoken {
-        /// Stores a single `bool` value on the storage.
-        value: bool,
+        /// ink! will create an implementation of the Default trait
+        /// total number of tokens
+        total_supply: Balance,
+        /// mapping between users and the number of tokens they own
+        /// mapping data structure is provided by the ink::storage crate
+        balances: Mapping<AccountId, Balance>,
+    }
+    
+    /// defining a custom Error struct that we'll use as the Err part of the Result
+    /// Error type enum with just one variant that takes no arguments
+    #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
+    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
+    pub enum Error {
+        InsufficientBalance,
     }
 
     impl Mytoken {
-        /// Constructor that initializes the `bool` value to the given `init_value`.
+        /// implementing a constructor for the MyToken contract
+        /// contract can have an arbitrary non-zero number of constructors
+        /// takes single argument: the initial supply of newly created token
         #[ink(constructor)]
-        pub fn new(init_value: bool) -> Self {
-            Self { value: init_value }
+        pub fn new(total_supply: Balance) -> Self {
+            // creating an empty Mapping
+            let mut balances = Mapping::default();
+            // access the address of an account that called contract
+            // in context of the constructor this will be the contract's creator/owner
+            let caller = Self::env().caller();
+            // deposits all that supply to the account of the contract creator
+            balances.insert(caller, &total_supply);
+            Self {
+                total_supply,
+                balances
+            }
         }
-
-        /// Constructor that initializes the `bool` value to `false`.
-        ///
-        /// Constructors can delegate to other constructors.
-        #[ink(constructor)]
-        pub fn default() -> Self {
-            Self::new(Default::default())
-        }
-
-        /// A message that can be called on instantiated contracts.
-        /// This one flips the value of the stored `bool` from `true`
-        /// to `false` and vice versa.
+        
+        /// the callable methods (messages) of our contract 
+        /// a message can be called on instantiated contracts
+        /// two methods for accessing the storage of the contract
+        /// both are read-only: don't modify the contract storage 
+        /// & can be called without submitting a transaction
+        /// 
+        /// reading the total supply
         #[ink(message)]
-        pub fn flip(&mut self) {
-            self.value = !self.value;
+        pub fn total_supply(&self) -> Balance {
+            self.total_supply
         }
-
-        /// Simply returns the current value of our `bool`.
+        
+        /// number of tokens held by a particular account
         #[ink(message)]
-        pub fn get(&self) -> bool {
-            self.value
+        pub fn balance_of(&self, account: AccountId) -> Balance {
+            // retrieve a value from the balances mapping for a given account
+            // result comes wrapped in an Option struct
+            // unwrap_or_default() retrieves the actual value 
+            // or default for the Balance type (which is 0)
+            self.balances.get(&account).unwrap_or_default()
         }
+        
     }
 
     /// Unit tests in Rust are normally defined within such a `#[cfg(test)]`
