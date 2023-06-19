@@ -85,6 +85,21 @@ mod mytoken {
             // or default for the Balance type (which is 0)
             self.balances.get(&account).unwrap_or_default()
         }
+
+        /// method for transferring tokens between accounts
+        #[ink(message)]
+        pub fn transfer(&mut self, to: AccountId, value: Balance) -> Result<(), Error> {
+            let from = self.env().caller();
+            let from_balance = self.balance_of(from);
+            if from_balance < value {
+                return Err(Error::InsufficientBalance);
+            }
+
+            self.balances.insert(from, &(from_balance - value));
+            let to_balance = self.balance_of(to);
+            self.balances.insert(to, &(to_balance + value));
+            Ok(())
+        }
         
     }
 
