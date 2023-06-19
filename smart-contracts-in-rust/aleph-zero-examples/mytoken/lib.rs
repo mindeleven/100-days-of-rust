@@ -87,14 +87,20 @@ mod mytoken {
         }
 
         /// method for transferring tokens between accounts
+        /// method can be called by any user to transfer tokens to a chosen recipient
+        /// this method modifies the contract storage
         #[ink(message)]
         pub fn transfer(&mut self, to: AccountId, value: Balance) -> Result<(), Error> {
             let from = self.env().caller();
+            // query the balance of the caller
             let from_balance = self.balance_of(from);
+            // if user tries to transfer more tokens than they own
+            // method exits without performing any changes
             if from_balance < value {
                 return Err(Error::InsufficientBalance);
             }
-
+            
+            // transfer modifies the contract storage
             self.balances.insert(from, &(from_balance - value));
             let to_balance = self.balance_of(to);
             self.balances.insert(to, &(to_balance + value));
