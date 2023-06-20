@@ -3,6 +3,7 @@ struct Person {
     name: String,
     age: i32,
     children: i32,
+    fave_color: Color,
 }
 
 #[derive(Debug)]
@@ -29,6 +30,7 @@ fn main() {
         name: "Matt".to_string(),
         age: 35, 
         children: 4,
+        fave_color: Color::Green("I like green".to_string()),
     };
 
     println!("Hello, people, from {}!", p.print());
