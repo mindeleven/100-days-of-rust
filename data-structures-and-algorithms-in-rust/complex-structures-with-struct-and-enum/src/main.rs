@@ -8,8 +8,8 @@ struct Person {
 #[derive(Debug)]
 #[allow(dead_code)]
 enum Color {
-    Red,
-    Green, 
+    Red(String),
+    Green(String), 
     Blue
 }
 
@@ -35,11 +35,16 @@ fn main() {
     // print struct to get debug information
     println!("#[derive(Debug)] allows to get debug information: {:?}", p);
 
-    let c = Color::Red;
+    let c = Color::Red("hi".to_string());
 
     match c {
-        Color::Red => println!("It's red"),
-        Color::Green => println!("It's green"),
+        // accessing the value stored in the variant
+        Color::Red(s) => {
+            println!("It's red with the value '{}'", s)
+        },
+        // if we don't care about the value stored in the variant 
+        // we can just use an underscore
+        Color::Green(_) => println!("It's green"),
         Color::Blue => println!("It's blue"),
     }
 }
