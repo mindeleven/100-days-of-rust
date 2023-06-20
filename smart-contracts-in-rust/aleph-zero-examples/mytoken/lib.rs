@@ -20,7 +20,7 @@
 /// a contract needs to have exactly one struct marked as #[ink::storage]
 /// a contract needs to have at least one function marked as #[ink::constructor]
 mod mytoken {
-    use ink::{storage::Mapping, primitives::AccountId};
+    use ink::{storage::Mapping};
     /// Defines the storage of your contract.
     /// contains data that's stored on the blockchain
     /// holds the state of the contract
@@ -78,12 +78,12 @@ mod mytoken {
         
         /// number of tokens held by a particular account
         #[ink(message)]
-        pub fn balance_of(&self, account: AccountId) -> Balance {
+        pub fn balance_of(&self, owner: AccountId) -> Balance {
             // retrieve a value from the balances mapping for a given account
             // result comes wrapped in an Option struct
             // unwrap_or_default() retrieves the actual value 
             // or default for the Balance type (which is 0)
-            self.balances.get(&account).unwrap_or_default()
+            self.balances.get(&owner).unwrap_or_default()
         }
 
         /// method for transferring tokens between accounts
@@ -109,101 +109,36 @@ mod mytoken {
         
     }
 
-    /// Unit tests in Rust are normally defined within such a `#[cfg(test)]`
-    /// module and test functions are marked with a `#[test]` attribute.
-    /// The below code is technically just normal Rust code.
+    /// test section copied from Aleph Zero documentation
     #[cfg(test)]
     mod tests {
-        /// Imports all the definitions from the outer scope so we can use them here.
         use super::*;
 
-        /// We test if the default constructor does its job.
         #[ink::test]
-        fn default_works() {
-            let mytoken = Mytoken::default();
-            assert_eq!(mytoken.get(), false);
+        fn total_supply_works() {
+            let mytoken = Mytoken::new(100);
+            assert_eq!(mytoken.total_supply(), 100);
         }
 
-        /// We test a simple use case of our contract.
         #[ink::test]
-        fn it_works() {
-            let mut mytoken = Mytoken::new(false);
-            assert_eq!(mytoken.get(), false);
-            mytoken.flip();
-            assert_eq!(mytoken.get(), true);
+        fn balance_of_works() {
+            let mytoken = Mytoken::new(100);
+            let accounts =
+                ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
+            assert_eq!(mytoken.balance_of(accounts.alice), 100);
+            assert_eq!(mytoken.balance_of(accounts.bob), 0);
+        }
+
+        #[ink::test]
+        fn transfer_works() {
+            let mut mytoken = Mytoken::new(100);
+            let accounts =
+                ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
+
+            assert_eq!(mytoken.balance_of(accounts.bob), 0);
+            assert_eq!(mytoken.transfer(accounts.bob, 10), Ok(()));
+            assert_eq!(mytoken.balance_of(accounts.bob), 10);
         }
     }
-
-
-    /// This is how you'd write end-to-end (E2E) or integration tests for ink! contracts.
-    ///
-    /// When running these you need to make sure that you:
-    /// - Compile the tests with the `e2e-tests` feature flag enabled (`--features e2e-tests`)
-    /// - Are running a Substrate node which contains `pallet-contracts` in the background
-    #[cfg(all(test, feature = "e2e-tests"))]
-    mod e2e_tests {
-        /// Imports all the definitions from the outer scope so we can use them here.
-        use super::*;
-
-        /// A helper function used for calling contract messages.
-        use ink_e2e::build_message;
-
-        /// The End-to-End test `Result` type.
-        type E2EResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-
-        /// We test that we can upload and instantiate the contract using its default constructor.
-        #[ink_e2e::test]
-        async fn default_works(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
-            // Given
-            let constructor = MytokenRef::default();
-
-            // When
-            let contract_account_id = client
-                .instantiate("mytoken", &ink_e2e::alice(), constructor, 0, None)
-                .await
-                .expect("instantiate failed")
-                .account_id;
-
-            // Then
-            let get = build_message::<MytokenRef>(contract_account_id.clone())
-                .call(|mytoken| mytoken.get());
-            let get_result = client.call_dry_run(&ink_e2e::alice(), &get, 0, None).await;
-            assert!(matches!(get_result.return_value(), false));
-
-            Ok(())
-        }
-
-        /// We test that we can read and write a value from the on-chain contract contract.
-        #[ink_e2e::test]
-        async fn it_works(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
-            // Given
-            let constructor = MytokenRef::new(false);
-            let contract_account_id = client
-                .instantiate("mytoken", &ink_e2e::bob(), constructor, 0, None)
-                .await
-                .expect("instantiate failed")
-                .account_id;
-
-            let get = build_message::<MytokenRef>(contract_account_id.clone())
-                .call(|mytoken| mytoken.get());
-            let get_result = client.call_dry_run(&ink_e2e::bob(), &get, 0, None).await;
-            assert!(matches!(get_result.return_value(), false));
-
-            // When
-            let flip = build_message::<MytokenRef>(contract_account_id.clone())
-                .call(|mytoken| mytoken.flip());
-            let _flip_result = client
-                .call(&ink_e2e::bob(), flip, 0, None)
-                .await
-                .expect("flip failed");
-
-            // Then
-            let get = build_message::<MytokenRef>(contract_account_id.clone())
-                .call(|mytoken| mytoken.get());
-            let get_result = client.call_dry_run(&ink_e2e::bob(), &get, 0, None).await;
-            assert!(matches!(get_result.return_value(), true));
-
-            Ok(())
-        }
-    }
+    
 }
