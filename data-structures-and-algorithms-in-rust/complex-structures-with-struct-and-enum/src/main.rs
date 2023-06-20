@@ -1,3 +1,4 @@
+#[derive(Debug)]
 struct Person {
     name: String,
     age: i32,
@@ -5,7 +6,9 @@ struct Person {
 }
 
 impl Person {
-    pub fn print(self) -> String {
+    /// to use Person after call to print self needs to be passed as reference
+    /// otherwise ownership is transfered to method
+    pub fn print(&self) -> String {
         format!(
             "name = {}, age = {}, has {} children", 
             self.name, self.age, self.children
@@ -21,4 +24,6 @@ fn main() {
     };
 
     println!("Hello, people, from {}!", p.print());
+    // print struct to get debug information
+    println!("#[derive(Debug)] allows to get debug information: {:?}", p);
 }
