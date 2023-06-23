@@ -1,6 +1,7 @@
 /// chapter 10, generic types, traits, and lifetimes
 /// generics allow us to replace specific types 
 /// with a placeholder the represents multiple types
+/// 1st a simple example that shows how to eliminate duplication
 fn main() {
     // simple example to find largest number in a list
     let number_list = vec![34, 87, 50, 100, 98, 2, 175];
