@@ -14,4 +14,17 @@ fn main() {
     }
 
     println!("Largest number in list is {}", largest);
+
+    // now, duplicating code to find largest number in second list
+    let number_list = vec![24, 67, 34, 130, 48, 52, 171];
+
+    let mut largest = &number_list[0];
+
+    for number in &number_list {
+        if number > largest {
+            largest = number;
+        }
+    }
+
+    println!("Largest number in both lists is {}", largest);
 }
