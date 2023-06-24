@@ -21,6 +21,32 @@ struct PointV2<T, U> {
     y: U,
 }
 
+/// generics in method definitions
+/// implementing method on struct Point<T>
+/// generic type T has to be delared right after impl
+/// doesn't have to have the same name
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+/// specifying a constraint on a generic type
+/// method only for i32 type
+#[allow(dead_code)]
+impl Point<i32> {
+    fn distance_from_origin(&self) -> f32 {
+        // method measures how far point is from (0.0, 0.0)
+        // uses mathematical operation that's only available 
+        // for floating point types
+        // following https://doc.rust-lang.org/book/ch10-01-syntax.html here
+        // and rust tells me 
+        // no method named `powi` found for type `i32` in the current scoperustc
+        // so I'll comment it out and leave it for now
+        //(self.x.powi(2) + self.y.powi(2)).sqrt()
+        1.23 // just to give something back
+    }
+}
+
 /// generics in enum definitions
 /// Option enum of standard library
 /// Enum with generic type T
@@ -32,6 +58,7 @@ enum Option<T> {
 /// Result enum of standard library
 /// Enum with multiple generic types
 /// generic over two types T and E
+#[allow(dead_code)]
 enum Result<T, E> {
     Ok(T),
     Err(E)
@@ -44,6 +71,9 @@ fn main() {
     let int_float = PointV2 { x: 5, y: 3.22};
 
     println!("Point struct of type integer: {:?}", integer);
+    // printing method
+    println!("integer.x = {}", integer.x());
+
     println!("Point struct of type float: {:?}", float);
     println!("Point struct of type integer and float: {:?}", int_float);
 }
