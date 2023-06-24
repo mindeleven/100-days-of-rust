@@ -20,6 +20,24 @@ struct PointV2<T, U> {
     x: T,
     y: U,
 }
+
+/// generics in enum definitions
+/// Option enum of standard library
+/// Enum with generic type T
+#[allow(dead_code)]
+enum Option<T> {
+    Some(T),
+    None
+}
+/// Result enum of standard library
+/// Enum with multiple generic types
+/// generic over two types T and E
+enum Result<T, E> {
+    Ok(T),
+    Err(E)
+}
+
+
 fn main() {
     let integer = Point { x: 5, y: 10};
     let float = Point { x: 1.0, y: 4.0 };
