@@ -95,6 +95,13 @@ fn main() {
 
     println!("Point struct of type float: {:?}", float);
     println!("Point struct of type integer and float: {:?}", int_float);
+
+    // using the mixup example
+    let p1 = PointV2 { x: 5, y: 3.22};
+    let p2 = PointV2 { x: "Hello", y: 'c'};
+
+    let p3 = p1.mixup(p2);
+    println!("Point p3 created with mixup: {:?}", p3);
 }
 
 
