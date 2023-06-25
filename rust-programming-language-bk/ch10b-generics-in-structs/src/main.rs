@@ -30,6 +30,20 @@ impl<T> Point<T> {
         &self.x
     }
 }
+
+#[allow(dead_code)]
+impl<T, U> PointV2<T, U> {
+    fn mixup<T2, U2>(
+        self,
+        other: PointV2<T2, U2>
+    ) -> PointV2<T, U2> {
+        PointV2 {
+            x: self.x,
+            y: other.y,
+        }
+    }
+}
+
 /// specifying a constraint on a generic type
 /// method only for i32 type
 #[allow(dead_code)]
