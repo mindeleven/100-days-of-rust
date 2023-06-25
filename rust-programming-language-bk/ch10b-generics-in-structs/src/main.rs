@@ -31,8 +31,13 @@ impl<T> Point<T> {
     }
 }
 
+/// structs method signature can use different generic types
+/// implementation with generic types of struct
 #[allow(dead_code)]
 impl<T, U> PointV2<T, U> {
+    // different types for mixup method
+    // method creates new point instance 
+    // with a new misture of types
     fn mixup<T2, U2>(
         self,
         other: PointV2<T2, U2>
