@@ -60,7 +60,12 @@ impl Summary for Tweet {
 }
 
 /// implementing the Teaser trait on the Tweet struct
-impl Teaser for Tweet {}
+/// default implementation can be overwritten
+impl Teaser for Tweet {
+    fn teaserize(&self) -> String {
+        String::from("Read more from ") + &self.username.to_string()
+    }
+}
 
 
 fn main() {
@@ -81,4 +86,5 @@ fn main() {
 
     println!("1 new tweet: {}", tweet.summarize());
     println!("New article available! {}", article.teaserize());
+    println!("Teaserize with tweet: {}", tweet.teaserize());
 }
