@@ -10,6 +10,17 @@ pub trait Summary {
 
 /// traits with default implementations
 pub trait Teaser {
+    fn summarize_author(&self) -> String;
+
+    // default implementations can call methods in the same trait that
+    // don't have default implementations
+    fn summarize_teaser(&self) -> String {
+        format!(
+            "Read more from {}....",
+            self.summarize_author()
+        )
+    }
+
     fn teaserize(&self) -> String {
         String::from("(Read more...)")
     }
@@ -38,7 +49,11 @@ impl Summary for NewsArticle {
 }
 
 /// implementing the Teaser trait on the NewsArticle struct
-impl Teaser for NewsArticle {}
+impl Teaser for NewsArticle {
+    fn summarize_author(&self) -> String {
+        format!("@{}", self.author)
+    }
+}
 
 /// (2) tweet
 pub struct Tweet {
@@ -62,6 +77,10 @@ impl Summary for Tweet {
 /// implementing the Teaser trait on the Tweet struct
 /// default implementation can be overwritten
 impl Teaser for Tweet {
+    fn summarize_author(&self) -> String {
+        format!("@{}", self.username)
+    }
+
     fn teaserize(&self) -> String {
         String::from("Read more from ") + &self.username.to_string()
     }
@@ -87,4 +106,6 @@ fn main() {
     println!("1 new tweet: {}", tweet.summarize());
     println!("New article available! {}", article.teaserize());
     println!("Teaserize with tweet: {}", tweet.teaserize());
+    println!("Teaser new tweet: {}", tweet.summarize_teaser());
+
 }
