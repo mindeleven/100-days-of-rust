@@ -8,6 +8,13 @@ pub trait Summary {
     fn summarize(&self) -> String;
 }
 
+/// traits with default implementations
+pub trait Teaser {
+    fn teaserize(&self) -> String {
+        String::from("(Read more...)")
+    }
+}
+
 /// implementing a trait type
 /// example: news article & tweet that both should make use of a summarize functionality
 /// (1) news article
@@ -30,6 +37,9 @@ impl Summary for NewsArticle {
     }
 }
 
+/// implementing the Teaser trait on the NewsArticle struct
+impl Teaser for NewsArticle {}
+
 /// (2) tweet
 pub struct Tweet {
     pub username: String,
@@ -49,6 +59,10 @@ impl Summary for Tweet {
     }
 }
 
+/// implementing the Teaser trait on the Tweet struct
+impl Teaser for Tweet {}
+
+
 fn main() {
     // calling the trait methods on the instances of the struct
     let tweet = Tweet {
@@ -59,12 +73,12 @@ fn main() {
     };
 
     let article = NewsArticle {
-        headline: String::from("Down and Out"),
-        loation: String::from("The Sprawl"),
+        headline: String::from("Penguins win the Stanley Cup Championship!"),
+        loation: String::from("Pittsburgh, PA, USA"),
         author: String::from("Dixie Flatline"),
-        content: String::from("No new tale to tell")
+        content: String::from("No new tale to tell, anything happened as expacted.")
     };
 
     println!("1 new tweet: {}", tweet.summarize());
-    println!("1 new article: {}", article.summarize());
+    println!("New article available! {}", article.teaserize());
 }
