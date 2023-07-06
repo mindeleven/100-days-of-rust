@@ -34,6 +34,7 @@ fn main() {
     };
 
     println!("Hello, people, from {}!", p.print());
+    println!("{:?}", p.fave_color);
     // print struct to get debug information
     println!("#[derive(Debug)] allows to get debug information: {:?}", p);
 
