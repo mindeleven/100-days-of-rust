@@ -1,3 +1,5 @@
+// add crate-level allow attribute (notice the !)
+#![allow(dead_code)]
 /// instructing the compiler that we're gonna make use of rocket macros
 #[macro_use] extern crate rocket;
 // importing/making use of json
