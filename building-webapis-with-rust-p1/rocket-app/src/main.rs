@@ -22,7 +22,7 @@ fn get_rustaceans() -> Value {
 }
 #[get("/rustaceans/<id>")]
 fn view_rustaceans(id: i32) -> Value {
-    json!({"id": 3, "name": "John Doe", "email": "john@doe.com"})
+    json!({"id": id, "name": "John Doe", "email": "john@doe.com"})
 }
 #[post("/rustaceans", format="json")]
 fn create_rustaceans() -> Value {
@@ -32,8 +32,8 @@ fn create_rustaceans() -> Value {
 fn update_rustaceans(id: i32) -> Value {
     json!({"id": id, "name": "John Doe", "email": "john@doe.com"})
 }
-#[delete("/rustaceans/<id>")]
-fn delete_rustaceans(id: i32) -> status::NoContent {
+#[delete("/rustaceans/<_id>")]
+fn delete_rustaceans(_id: i32) -> status::NoContent {
     status::NoContent
 }
 
@@ -54,7 +54,14 @@ fn hello() -> Value {
 #[rocket::main]
 async fn main() {
     let _ = rocket::build()
-        .mount("/", routes![hello])
+        .mount("/", routes![
+            hello,
+            get_rustaceans,
+            view_rustaceans,
+            create_rustaceans,
+            update_rustaceans,
+            delete_rustaceans
+        ])
         .launch()
         .await;
 }
