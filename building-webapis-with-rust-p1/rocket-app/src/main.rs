@@ -13,6 +13,7 @@ use rocket::{serde::json::{Value, json}, response::status};
 /// DELETE delete existing
 /// 
 /// CRUD endpoints for fictional rustaceans database
+/// curl http://127.0.0.1:8000/rustaceans
 #[get("/rustaceans")]
 fn get_rustaceans() -> Value {
     json!([
@@ -20,18 +21,23 @@ fn get_rustaceans() -> Value {
         {"id": 4, "name": "John Again Doe", "email": "john.again@doe.com"}
     ])
 }
+/// curl http://127.0.0.1:8000/rustaceans/66           
 #[get("/rustaceans/<id>")]
 fn view_rustaceans(id: i32) -> Value {
     json!({"id": id, "name": "John Doe", "email": "john@doe.com"})
 }
+/// curl http://127.0.0.1:8000/rustaceans -X POST -H 'Content-type: application/json'
 #[post("/rustaceans", format="json")]
 fn create_rustaceans() -> Value {
     json!({"id": 3, "name": "John Doe", "email": "john@doe.com"})
 }
+/// curl http://127.0.0.1:8000/rustaceans/1 -X PUT -H 'Content-type: application/json'
 #[put("/rustaceans/<id>", format="json")]
 fn update_rustaceans(id: i32) -> Value {
     json!({"id": id, "name": "John Doe", "email": "john@doe.com"})
 }
+/// curl http://127.0.0.1:8000/rustaceans/123 -X DELETE
+/// curl http://127.0.0.1:8000/rustaceans/123 -X DELETE -I 
 #[delete("/rustaceans/<_id>")]
 fn delete_rustaceans(_id: i32) -> status::NoContent {
     status::NoContent
