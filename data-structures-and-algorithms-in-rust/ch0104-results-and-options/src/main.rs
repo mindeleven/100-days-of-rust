@@ -4,6 +4,14 @@ enum Res<T, E> {
     Thing(T),
     Error(E),
 }
+
+// Option enum
+// is used when something could be there but might not be there
+pub enum Option<T> {
+    Some(T),
+    None,
+}
+
 fn main() {
     let a = divide(10, 5);
     let b = divide(10, 0);
