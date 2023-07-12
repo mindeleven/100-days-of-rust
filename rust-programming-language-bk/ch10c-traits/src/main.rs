@@ -8,6 +8,12 @@ pub trait Summary {
     fn summarize(&self) -> String;
 }
 
+/// defining another trait for multiple trait bounds example
+pub trait Display {
+    // defining the signatures on the methods
+    fn display(&self) -> String;
+}
+
 /// traits with default implementations
 pub trait Teaser {
     fn summarize_author(&self) -> String;
@@ -109,3 +115,41 @@ fn main() {
     println!("Teaser new tweet: {}", tweet.summarize_teaser());
 
 }
+
+/// traits as parameters
+/// no concrete type for item parameter 
+/// but impl keyword and trait name
+/// and instance of NewsArticle or Tweet could be passed
+/// types that don't implement Summary won't compile
+pub fn notify(item: &impl Summary) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+/// longer form of the example above ("trait bound syntax"):
+pub fn notify_v2<T: Summary>(item: &T) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+/// function with two parameters that implement summary
+/// function can have different implementations of summary as parameters
+pub fn notify_v3(item: &impl Summary, item2: &impl Summary) {
+    println!("Breaking news! {}", item.summarize());
+    println!("More breaking news! {}", item2.summarize());
+}
+
+/// trait bound syntax is needed if we want to force both parameters
+/// to have the same type
+pub fn notify_v4<T: Summary>(item: &T, item2: &T) {
+    println!("Breaking news! {}", item.summarize());
+    println!("More breaking news! {}", item2.summarize());
+}
+
+/// specifying multiple trait bounds with the + syntax
+pub fn notify_v5(item: &(impl Summary + Display)) {
+    println!("Breaking news! {}", item.summarize());
+}
+pub fn notify_v6<T: Summary + Display>(item: &T) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+
