@@ -12,8 +12,55 @@ use rocket::{serde::json::{Value, json}, response::status};
 /// PUT update existing
 /// DELETE delete existing
 /// 
+/// struct for username and password
+pub struct BasicAuth {
+    pub username: String,
+    pub password: String,
+}
+
+/// implementing factory methods for the struct
+impl BasicAuth {
+    fn from_authorization_header(header: &str) -> Option<BasicAuth> {
+        let split = header.split_whitespace().collect::<Vec< >>();
+
+        if split.len() != 2 {
+            return None;
+        }
+
+        if split[0] != "Basic" {
+            return None;
+        }
+    
+        Self::from_base64_encoded(split[1])
+    }
+
+    fn from_base64_encoded(base_64_string: &str) -> Option<BasicAuth> {
+        let decoded = base64::decode(base_64_string).ok()?;
+        let decoded_str = String::from_utf8(decoded).ok()?;
+        let split = decoded_str.split(":").collect::<Vec< >>();
+
+        // if exactly username and password pair are present
+        if split.len() != 2 {
+            return None;
+        }
+        
+        let (username, password) = (split[0].to_string(), split[1].to_string());
+
+        // let username = "foo".to_string();
+        // let password = "bar".to_string();
+        
+        Some(BasicAuth { username, password })
+
+    }
+}
+
 /// CRUD endpoints for fictional rustaceans database
 /// curl http://127.0.0.1:8000/rustaceans
+/// making this route only accessible if someone specifies 
+/// Basic access authentication with header 
+/// see https://en.wikipedia.org/wiki/Basic_access_authentication
+/// Base64 encoding of Aladdin:open sesame
+/// curl http://127.0.0.1:8000/rustaceans -H 'Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=='
 #[get("/rustaceans")]
 fn get_rustaceans() -> Value {
     json!([
