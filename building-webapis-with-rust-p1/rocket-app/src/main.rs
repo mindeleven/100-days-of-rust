@@ -43,7 +43,13 @@ fn delete_rustaceans(_id: i32) -> status::NoContent {
     status::NoContent
 }
 
-/// 
+/// Rocket comes with predefined error catches
+/// which can be overwritten (and have to be reistered in main)
+#[catch(404)]
+fn not_found() -> Value {
+    json!("Not found")
+}
+
 /// defining endpoint with attribute
 /// incoming get request to "/"
 #[get("/")]
@@ -67,6 +73,9 @@ async fn main() {
             create_rustaceans,
             update_rustaceans,
             delete_rustaceans
+        ])
+        .register("/", catchers![
+            not_found
         ])
         .launch()
         .await;
