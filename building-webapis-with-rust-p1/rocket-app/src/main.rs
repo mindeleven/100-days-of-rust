@@ -3,7 +3,7 @@
 /// instructing the compiler that we're gonna make use of rocket macros
 #[macro_use] extern crate rocket;
 // importing/making use of json
-use rocket::{serde::json::{Value, json}, response::status};
+use rocket::{serde::json::{Value, json}, response::status, http::{hyper::Request, Status}, data::Outcome, request::FromRequest};
 
 /// CRUD endpoints
 /// GET list existing
@@ -20,8 +20,11 @@ pub struct BasicAuth {
 
 /// implementing factory methods for the struct
 impl BasicAuth {
+    // factory function gets passed the value of the header
+    // which is Basic "QWxhZGRpbjpvcGVuIHNlc2FtZQ=="
     fn from_authorization_header(header: &str) -> Option<BasicAuth> {
-        let split = header.split_whitespace().collect::<Vec< >>();
+        // split header value by whitespace and collect it into a vector
+        let split = header.split_whitespace().collect::<Vec<_>>();
 
         if split.len() != 2 {
             return None;
@@ -35,9 +38,11 @@ impl BasicAuth {
     }
 
     fn from_base64_encoded(base_64_string: &str) -> Option<BasicAuth> {
+        // trying to convert result to option
+        // ? tells Rust only to continue to next line if ok
         let decoded = base64::decode(base_64_string).ok()?;
         let decoded_str = String::from_utf8(decoded).ok()?;
-        let split = decoded_str.split(":").collect::<Vec< >>();
+        let split = decoded_str.split(":").collect::<Vec<_>>();
 
         // if exactly username and password pair are present
         if split.len() != 2 {
@@ -52,6 +57,30 @@ impl BasicAuth {
         Some(BasicAuth { username, password })
 
     }
+}
+
+/// implementing request guard
+/// https://rocket.rs/v0.4/guide/requests/#request-guards
+/// from the documentation: a request guard protects a handler from being called 
+/// erroneously based on information contained in an incoming request. More 
+/// specifically, a request guard is a type that represents an arbitrary validation 
+/// policy. The validation policy is implemented through the FromRequest trait. 
+/// Every type that implements FromRequest is a request guard.
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for BasicAuth {
+    type Error = ();
+    
+    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        let auth_header = request.headers().get_one("Authorization");
+        if let Some(auth_header) = auth_header {
+            if let Some(auth) = Self::from_authorization_header(auth_header) {
+                return Outcome::Success(auth)
+            }
+        }
+
+        Outcome::Failure((Status::Unauthorized, ()))
+    }
+
 }
 
 /// CRUD endpoints for fictional rustaceans database

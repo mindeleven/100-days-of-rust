@@ -1,7 +1,32 @@
+use std::str::FromStr;
+use std::env;
+
 fn main() {
     let a: u64 = 567;
     let b: u64 = 678;
     println!("greatest common divisor of {} and {}: {}", a, b, gcd(a, b));
+
+    // taking a series of numbers as command line argument
+    // and print their greatest common divisor
+    let mut numbers = Vec::new(); 
+
+    for arg in env::args().skip(1) {
+        numbers.push(u64::from_str(&arg)
+            .expect("error parsing argument"));
+    }
+
+    if numbers.len() == 0 {
+        eprint!("Usage: gcd NUMBER ...");
+        std::process::exit(1);
+    }
+
+    let mut d = numbers[0];
+    for m in &numbers[1..] {
+        d = gcd(d, *m);
+    }
+
+    println!("The greatest common divisor of {:?} is {}", numbers, d);
+    
 }
 
 #[allow(dead_code)]
